@@ -164,7 +164,7 @@ class EncryptedDatabase {
         let createCacheTable = """
         CREATE TABLE IF NOT EXISTS cache_metadata (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            url TEXT PRIMARY KEY NOT NULL,
+            url TEXT UNIQUE NOT NULL,
             cached_at REAL NOT NULL,
             expires_at REAL,
             etag TEXT,
