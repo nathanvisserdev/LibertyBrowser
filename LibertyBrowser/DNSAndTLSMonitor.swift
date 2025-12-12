@@ -150,7 +150,7 @@ class DNSAndTLSMonitor {
     
     private func extractCertificateChain(from metadata: NWProtocolTLS.Metadata, completion: @escaping ([SecCertificate]) -> Void) {
         // Extract certificate chain using Security framework
-        var certificates: [SecCertificate] = []
+        let certificates: [SecCertificate] = []
         
         // Note: This requires accessing sec_protocol_metadata which is part of the Network framework
         // The actual implementation would use sec_protocol_metadata_copy_peer_public_key

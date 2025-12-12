@@ -169,9 +169,11 @@ class iCloudSyncManager {
     
     private func setupSubscriptions() {
         // Set up subscriptions to be notified of changes
+        let subscriptionID = "network-audit-subscription"
         let subscription = CKQuerySubscription(
             recordType: networkAuditRecordType,
             predicate: NSPredicate(value: true),
+            subscriptionID: subscriptionID,
             options: [.firesOnRecordCreation, .firesOnRecordUpdate]
         )
         
