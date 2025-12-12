@@ -1,6 +1,7 @@
 import Foundation
 import Network
 import WebKit
+import Combine
 
 /// Monitors and logs network activity with forensic-grade detail
 class NetworkAuditLogger {
@@ -55,11 +56,11 @@ class NetworkAuditLogger {
     }
     
     /// Log connection establishment
-    func logConnection(requestId: String, ipAddress: String, port: Int, protocol: String, connectionTime: TimeInterval) {
+    func logConnection(requestId: String, ipAddress: String, port: Int, protocolName: String, connectionTime: TimeInterval) {
         queue.async {
             self.activeRequests[requestId]?.ipAddress = ipAddress
             self.activeRequests[requestId]?.port = port
-            self.activeRequests[requestId]?.protocol = protocol
+            self.activeRequests[requestId]?.protocol = protocolName
             self.activeRequests[requestId]?.connectionTime = connectionTime
         }
     }
@@ -276,7 +277,7 @@ class NetworkMonitoringDelegate: NSObject, URLSessionTaskDelegate, URLSessionDat
                     requestId: requestId,
                     ipAddress: remoteAddress,
                     port: remotePort,
-                    protocol: transactionMetrics.networkProtocolName ?? "unknown",
+                    protocolName: transactionMetrics.networkProtocolName ?? "unknown",
                     connectionTime: connectionTime
                 )
             }
@@ -285,10 +286,22 @@ class NetworkMonitoringDelegate: NSObject, URLSessionTaskDelegate, URLSessionDat
             if let secureStart = transactionMetrics.secureConnectionStartDate,
                let secureEnd = transactionMetrics.secureConnectionEndDate {
                 let tlsTime = secureEnd.timeIntervalSince(secureStart)
+                
+                // Convert TLS version and cipher suite to strings
+                var tlsVersionString = "unknown"
+                if let tlsVersion = transactionMetrics.negotiatedTLSProtocolVersion {
+                    tlsVersionString = "TLS \(tlsVersion.rawValue)"
+                }
+                
+                var cipherSuiteString = "unknown"
+                if let cipherSuite = transactionMetrics.negotiatedTLSCipherSuite {
+                    cipherSuiteString = String(format: "0x%04X", cipherSuite.rawValue)
+                }
+                
                 NetworkAuditLogger.shared.logTLSHandshake(
                     requestId: requestId,
-                    tlsVersion: transactionMetrics.negotiatedTLSProtocolVersion?.description ?? "unknown",
-                    cipherSuite: transactionMetrics.negotiatedTLSCipherSuite?.description ?? "unknown",
+                    tlsVersion: tlsVersionString,
+                    cipherSuite: cipherSuiteString,
                     handshakeTime: tlsTime,
                     certificateChain: nil // Would need additional API access
                 )

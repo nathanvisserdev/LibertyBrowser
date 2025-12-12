@@ -7,6 +7,8 @@
 
 import SwiftUI
 import CryptoKit
+import Combine
+import LocalAuthentication
 
 @main
 struct LibertyBrowserApp: App {

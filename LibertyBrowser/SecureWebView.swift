@@ -1,5 +1,6 @@
 import SwiftUI
 import WebKit
+import Combine
 
 /// Custom WKWebView wrapper with security and monitoring features
 struct SecureWebView: NSViewRepresentable {
@@ -59,8 +60,11 @@ struct SecureWebView: NSViewRepresentable {
             // Configure WKWebView with security settings
             let config = WKWebViewConfiguration()
             
-            // Enable JavaScript but monitor it
-            config.preferences.javaScriptEnabled = true
+            // Configure default webpage preferences (JavaScript enabled by default, monitored)
+            let webpagePreferences = WKWebpagePreferences()
+            webpagePreferences.allowsContentJavaScript = true
+            config.defaultWebpagePreferences = webpagePreferences
+            
             config.preferences.javaScriptCanOpenWindowsAutomatically = false
             
             // Configure content controller for message handling
